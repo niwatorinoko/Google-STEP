@@ -1,0 +1,26 @@
+# from collections import defaultdict
+
+
+# def solution(input_word, dictionary):
+#     sorted_word = sorted(input_word)
+
+#     new_dictionary = defaultdict(list)
+#     for word in dictionary:
+#         #計算量へらせる、文字数によって省略できる
+#         new_dictionary[sorted(word)].append(word)
+#     return new_dictionary[sorted_word]
+#     # new_dictionary.sort()
+#     # anagram = search(sorted_word, new_dictionary.keys())
+#     # return anagram
+
+# def search(sorted_word, new_dictionary):
+#     ans = []
+#     p = 0
+#     l = 
+#     while l < r:
+
+
+#     return ans
+
+# input_word = input()
+# dictionary = []
