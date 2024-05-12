@@ -16,5 +16,5 @@ def solution(input_word):
             new_dictionary["".join(sorted(word))].append(word)
     return new_dictionary[sorted_word]
 
-input_word = input("Please input word : ")
-print(solution(input_word))
+# input_word = input("Please input word : ")
+# print(solution(input_word))
