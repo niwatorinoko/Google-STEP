@@ -5,7 +5,7 @@ from collections import defaultdict
 def solution(input_word):
     sorted_word = "".join(sorted(input_word))
 
-    word_file = open("step2/anagram/words.txt", "r")
+    word_file = open("anagram/words.txt", "r")
     words = word_file.readlines()
     word_file.close()
 
@@ -16,5 +16,5 @@ def solution(input_word):
             new_dictionary["".join(sorted(word))].append(word)
     return new_dictionary[sorted_word]
 
-input_word = input()
+input_word = input("Please input word : ")
 print(solution(input_word))
