@@ -2,14 +2,20 @@ from collections import Counter,defaultdict
 
 
 def find_highest_score_anagram(input_word):
-    input_word_counter = Counter(input_word)
+    dictionary_words_counter()
 
-    ans = ["", 0]
+    input_word_counter = Counter(input_word)
+    
+    curr_word = ""
+    curr_score = 0
+    #[現在の一番ハイスコアな単語, スコア]
+    #ans = ["", 0]
     for dict_word, counter in DICTIONARY_COUNT.items():
         if counter <= input_word_counter:
-            if ans[1] < max(ans[1], word_score_calculator(dict_word)):
-                ans = [dict_word, word_score_calculator(dict_word)]
-    return ans
+            if curr_score < max(curr_score, word_score_calculator(dict_word)):
+                curr_word = dict_word
+                curr_score = max(curr_score, word_score_calculator(dict_word))
+    return curr_word
 
 
 def word_score_calculator(word):
@@ -32,31 +38,17 @@ def dictionary_words_counter():
         DICTIONARY_COUNT[word] = word_counter
 
 
-def small_text_score_count():
-    fname = open("anagram/small.txt", "r")
-    with open(fname,"r") as file:
+def write_high_score_anagram(problem_file, answer_file):
+    with open(problem_file, "r") as file:
         words = file.read().splitlines()    
 
-    small_text_answer_file = open("anagram/small_answer.txt", "w")
-    for small_word in words:
-        small_text_answer_file.write(find_highest_score_anagram(small_word)[0] + "\n")
+    with open(answer_file, "w") as file:
+        for word in words:
+            file.write(find_highest_score_anagram(word) + "\n")
 
 
-def medium_text_score_count():
-    fname = open("anagram/medium.txt", "r")
-    with open(fname,"r") as file:
-        words = file.read().splitlines()    
-
-    medium_text_answer_file = open("anagram/medium_answer.txt", "w")
-    for medium_word in words:
-        medium_text_answer_file.write(find_highest_score_anagram(medium_word)[0] + "\n")
-
-
-def large_text_score_count():
-    fname = open("anagram/large.txt", "r")
-    with open(fname,"r") as file:
-        words = file.read().splitlines()    
-
-    large_text_answer_file = open("anagram/large_answer.txt", "w")
-    for large_word in words:
-        large_text_answer_file.write(find_highest_score_anagram(large_word)[0] + "\n")
+# if __name__ == '__main__':
+#     write_high_score_anagram("anagram/small.txt", "anagram/small_answer.txt")
+#     write_high_score_anagram("anagram/medium.txt", "anagram/medium_answer.txt")
+#     write_high_score_anagram("anagram/large.txt", "anagram/large_answer.txt")
+#     print(find_highest_score_anagram("funseseldenessse"))
