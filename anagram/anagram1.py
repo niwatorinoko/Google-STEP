@@ -51,6 +51,5 @@ def find_anagram_by_binary_search(input_word, dict_words):
     return binary_search(new_dict, sorted_input_word, input_word)
 
 
-# input_word = input("Please input word : ")
-# print(find_anagram("stop", dictionary_to_list()))
-# print(find_anagram_by_binary_search("stop", dictionary_to_list()))z
+# print(find_anagram("a", dictionary_to_list()))
+# print(find_anagram_by_binary_search("a", dictionary_to_list()))
