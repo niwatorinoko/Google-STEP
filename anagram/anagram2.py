@@ -60,10 +60,3 @@ def large_text_score_count():
     large_text_answer_file = open("anagram/large_answer.txt", "w")
     for large_word in words:
         large_text_answer_file.write(find_highest_score_anagram(large_word)[0] + "\n")
-
-
-#if __name__ == '__main__':
-    #dictionary_words_counter()
-    #small_count()
-    #medium_count()
-    #large_count()
