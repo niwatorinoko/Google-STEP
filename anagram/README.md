@@ -1,4 +1,4 @@
-# Week1 Anagram
+# Week1 "Anagram"
 
 # HW１　anagram1.py / anagram1_test.py
 ### 方法①:辞書のValueに追加していく
