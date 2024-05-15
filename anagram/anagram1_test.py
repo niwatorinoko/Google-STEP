@@ -16,7 +16,7 @@ class TestAnagram(unittest.TestCase):
         assert anagram == []
 
     
-    def test_should_return_cat_and_act(self):
+    def test_should_return_many_words(self):
         anagram = find_anagram("stop", dictionary_to_list())
         assert "post" in anagram
         assert "opts" in anagram
@@ -44,6 +44,15 @@ class TestAnagram(unittest.TestCase):
         anagram = find_anagram("あいうえおかきくけこ", dictionary_to_list())
         assert anagram == []
 
+    
+    def test_should_return_one_word(self):
+        anagram = find_anagram("cat", dictionary_to_list())
+        assert anagram == ["act"]
+
+
+    def test_should_return_empty_if_no_anagram(self):
+        anagram = find_anagram("image", dictionary_to_list())
+        assert anagram == []
 
 if __name__ == '__main__':
     unittest.main()
