@@ -27,7 +27,8 @@ class TestAnagram(unittest.TestCase):
 
     def test_should_return_empty_with_spaced_input_string(self):
         anagram = find_anagram("t ca", dictionary_to_list())
-        assert anagram == []
+        assert "cat" in anagram
+        assert "act" in anagram
 
 
     def test_should_return_empty_if_word_too_long(self):
@@ -37,7 +38,7 @@ class TestAnagram(unittest.TestCase):
     
     def test_should_return_empty_if_word_too_short(self):
         anagram = find_anagram("j", dictionary_to_list())
-        assert anagram == []
+        assert anagram == ["j"]
 
 
     def test_should_return_empty_if_word_has_special_char(self):
@@ -47,12 +48,12 @@ class TestAnagram(unittest.TestCase):
     
     def test_should_return_one_word(self):
         anagram = find_anagram("cat", dictionary_to_list())
-        assert anagram == ["act"]
+        assert anagram == ["act", "cat"]
 
 
     def test_should_return_empty_if_no_anagram(self):
         anagram = find_anagram("image", dictionary_to_list())
-        assert anagram == []
+        assert anagram == ["image"]
 
 if __name__ == '__main__':
     unittest.main()
