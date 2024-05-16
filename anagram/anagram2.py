@@ -4,6 +4,7 @@ from collections import Counter,defaultdict
 def find_highest_score_anagram(input_word):
     dictionary_words_counter()
 
+    input_word = input_word.replace(" ", "")
     input_word_counter = Counter(input_word)
     
     curr_word = ""
