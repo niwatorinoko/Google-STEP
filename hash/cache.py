@@ -115,14 +115,20 @@ class Cache:
     # |contents|: The contents of the URL
     def access_page(self, url, contents):
         #------------------------#
+        #valueはnodeの情報が全て入ってる？
         value, found = self.hash_table.get(url)
         if found:
+            #Hash tableにurlが保存されてた場合、linked listから削除
             node = value
             self._remove_node(node)
-            #node.contents = contentsなくてもいける
+            node.contents = contents
         else:
+            #保存されてない場合
             if self.size >= self.capacity:
+                #もし、キャッシュの容量がキャパシティ以上だったら
+                #ダミーテールのひとつ前
                 tail_node = self.tail.prev
+                #ダミーテールのひとつ前のNodeを削除
                 self._remove_node(tail_node)
                 self.hash_table.delete(tail_node.url)
                 self.size -= 1
