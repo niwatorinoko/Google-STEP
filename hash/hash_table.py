@@ -67,9 +67,7 @@ class HashTable:
             self.rehash()
         bucket_index = calculate_hash(key) % self.bucket_size
         item = self.buckets[bucket_index]
-        #ただキーの被りを探す？
         while item:
-            #見つけたらバリューアップデート？？
             if item.key == key:
                 item.value = value
                 return False
@@ -107,14 +105,14 @@ class HashTable:
         item = self.buckets[bucket_index]
         prev_item = None
 
-        # Traverse the linked list to find the item to delete
+        #linked listを消したいItemが見つかるまで辿る
         while item:
             if item.key == key:
                 if prev_item:
-                    # If the item to delete is in the middle or end
+                    #prev_itemがNoneではない->中間or最後にある場合
                     prev_item.next = item.next
                 else:
-                    # If the item to delete is at the head of the list
+                    #先頭にある場合
                     self.buckets[bucket_index] = item.next
                 self.item_count -= 1
                 return True
@@ -137,25 +135,29 @@ class HashTable:
         
    
     def rehash(self):
+        #tableを大きくしたいので大体２倍かつ素数を探す
         new_bucket_size = self.find_next_prime(self.bucket_size * 2)
         new_buckets = [None] * new_bucket_size
+        #1つ1つ元のtableに要素が入っていないか確認する
         for i in range(self.bucket_size):
             item = self.buckets[i]
+            #もしItemがある場合、新しいHashに入れる
             while item:
                 new_bucket_index = calculate_hash(item.key) % new_bucket_size
                 new_item = Item(item.key, item.value, new_buckets[new_bucket_index])
                 new_buckets[new_bucket_index] = new_item
                 item = item.next
+        #完了したら、この2つの変数も更新する
         self.buckets = new_buckets
         self.bucket_size = new_bucket_size
+    
 
-    
-    
     def find_next_prime(self, n):
         def is_prime(num):
             if num <= 1:
                 return False
             for i in range(2, int(num ** 0.5) + 1):
+                #2~その数の2分の1まで約数がないか確認
                 if num % i == 0:
                     return False
             return True
