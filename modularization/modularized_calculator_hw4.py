@@ -1,0 +1,197 @@
+#! /usr/bin/python3
+
+def read_number(line, index):
+    number = 0
+    while index < len(line) and line[index].isdigit():
+        number = number * 10 + int(line[index])
+        index += 1
+    if index < len(line) and line[index] == '.':
+        index += 1
+        decimal = 0.1
+        while index < len(line) and line[index].isdigit():
+            number += int(line[index]) * decimal
+            decimal /= 10
+            index += 1
+    token = {'type': 'NUMBER', 'number': number}
+    return token, index
+
+
+def read_plus(line, index):
+    token = {'type': 'PLUS'}
+    return token, index + 1
+
+
+def read_minus(line, index):
+    token = {'type': 'MINUS'}
+    return token, index + 1
+
+
+def read_times(line, index):
+    token = {'type': 'TIMES'}
+    return token, index + 1
+
+
+def read_divided(line, index):
+    token = {'type': 'DIVIDED'}
+    return token, index + 1
+
+
+def read_left_parenthesis(line, index):
+    token = {'type': 'LEFT_PARENTHESIS'}
+    return token, index + 1
+
+
+def read_func(line, index):
+    func = ""
+    while index < len(line) and line[index].isalpha():
+        func += line[index]
+        index += 1
+    token = {'type': 'FUNC', 'func': func}
+    return token, index
+
+
+def tokenize(line):
+    tokens_stack = []
+    index = 0
+    while index < len(line):
+        if line[index].isdigit():
+            (token, index) = read_number(line, index)
+
+        elif line[index] == '+':
+            (token, index) = read_plus(line, index)
+
+        elif line[index] == '-':
+            (token, index) = read_minus(line, index)
+
+        elif line[index] == '*':
+            (token, index) = read_times(line, index)
+            
+        elif line[index] == '/':
+            (token, index) = read_divided(line, index)
+        
+        elif line[index] == '(':
+            (token, index) = read_left_parenthesis(line, index)
+
+        elif line[index] == ')':
+            #括弧の中を計算する
+            temp_tokens = []
+            temp_index = len(tokens_stack)-1
+            while tokens_stack[temp_index] != {'type': 'LEFT_PARENTHESIS'}:
+                temp_tokens.insert(0, tokens_stack[temp_index])
+                tokens_stack.pop(-1)
+                temp_index -= 1
+            tokens_stack.pop(-1)
+            evaluated_tokens = first_evaluate(temp_tokens)
+            answer_in_parentheses = second_evaluate(evaluated_tokens)
+            #括弧の前に関数が書いてある場合
+            if len(tokens_stack) > 0 and tokens_stack[-1]['type'] == 'FUNC':
+                function = tokens_stack.pop(-1)
+                if function['func'] == 'abs':
+                    answer_in_parentheses = abs(answer_in_parentheses)
+                elif function['func'] == 'int':
+                    answer_in_parentheses = int(answer_in_parentheses)
+                elif function['func'] == 'round':
+                    answer_in_parentheses = round(answer_in_parentheses)
+                else:
+                    print("Invalid function!!")
+                    exit(1)
+
+            token = {'type': 'NUMBER', 'number': answer_in_parentheses}
+            index += 1
+        
+        elif line[index].isalpha():
+            (token, index) = read_func(line, index)
+
+        else:
+            print('Invalid character found: ' + line[index])
+            exit(1)
+        tokens_stack.append(token)
+    return tokens_stack
+
+
+def first_evaluate(tokens):
+    evaluated_tokens = []
+    tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
+    index = 1
+    while index < len(tokens):
+        #print(tokens)
+        if tokens[index]['type'] == 'NUMBER':
+
+            if tokens[index - 1]['type'] == 'PLUS':
+                evaluated_tokens.append(tokens[index-1])
+                evaluated_tokens.append(tokens[index])
+
+            elif tokens[index - 1]['type'] == 'MINUS':
+                evaluated_tokens.append(tokens[index-1])
+                evaluated_tokens.append(tokens[index])
+
+            elif tokens[index - 1]['type'] == 'TIMES':
+                num = evaluated_tokens.pop(-1)
+                answer = num['number']*tokens[index]['number']
+                evaluated_tokens.append({'type': 'NUMBER', 'number': answer})
+
+            elif tokens[index - 1]['type'] == 'DIVIDED':
+                num = evaluated_tokens.pop(-1)
+                answer = num['number']/tokens[index]['number']
+                evaluated_tokens.append({'type': 'NUMBER', 'number': answer})
+
+            else:
+                print('Invalid syntax')
+                exit(1)
+        index += 1
+    return evaluated_tokens
+
+def second_evaluate(tokens):
+    answer = 0
+    index = 1
+    while index < len(tokens):
+        if tokens[index]['type'] == 'NUMBER':
+            if tokens[index - 1]['type'] == 'PLUS':
+                answer += tokens[index]['number']
+            elif tokens[index - 1]['type'] == 'MINUS':
+                answer -= tokens[index]['number']
+            else:
+                print('Invalid syntax')
+                exit(1)
+        index += 1
+    return answer
+
+
+def test(line):
+    tokens = tokenize(line)
+    evaluated_tokens = first_evaluate(tokens)
+    actual_answer = second_evaluate(evaluated_tokens)
+    expected_answer = eval(line)
+    if abs(actual_answer - expected_answer) < 1e-8:
+        print("PASS! (%s = %f)" % (line, expected_answer))
+    else:
+        print("FAIL! (%s should be %f but was %f)" % (line, expected_answer, actual_answer))
+
+
+# Add more tests to this function :)
+def run_test():
+    print("==== Test started! ====")
+    test("1+2")
+    test("1.0+2.1-3")
+    test("3.0+4*2-1/5")
+    test("27/3/3")
+    test("27/3.0/3")
+    test("27/3.0/3.0")
+    test("27.4/3.0/3.0")
+    test("27.4*3.0/3.0")
+    test("1+1+2+32/3*12*3")
+    test("(3.0+4*(2-1))/5")
+    test("abs(-2.2)")
+    test("int(1.55)")
+    test("round(1.55)")
+    test("12+abs(int(round(-1.55)+abs(int(-2.3+4))))")
+    print("==== Test finished! ====\n")
+
+run_test()
+
+# while True:
+#     print('> ', end="")
+#     line = input()
+#     tokens = tokenize(line)
+#     answer = evaluate(tokens)
+#     print("answer = %f\n" % answer)
