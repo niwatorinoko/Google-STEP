@@ -130,6 +130,7 @@ class Cache:
                 tail_node = self.tail.prev
                 #ダミーテールのひとつ前のNodeを削除
                 self._remove_node(tail_node)
+                #nextの参照を変える
                 self.hash_table.delete(tail_node.url)
                 self.size -= 1
 

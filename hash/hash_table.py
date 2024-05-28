@@ -16,7 +16,7 @@ import random, sys, time
 def calculate_hash(key):
     assert type(key) == str
     # Note: This is not a good hash function. Do you see why? 
-    # ->If only using ascii, anagrams are same hash value.
+    # ->If use only ASCII, the anagrams will have the same hash value.
     hash = 0
     prime = 31
     for i in range(len(key)):
