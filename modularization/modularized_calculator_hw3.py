@@ -89,7 +89,6 @@ def first_evaluate(tokens):
     tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
     index = 1
     while index < len(tokens):
-        #print(tokens)
         if tokens[index]['type'] == 'NUMBER':
 
             if tokens[index - 1]['type'] == 'PLUS':
@@ -146,15 +145,6 @@ def test(line):
 # Add more tests to this function :)
 def run_test():
     print("==== Test started! ====")
-    test("1+2")
-    test("1.0+2.1-3")
-    test("3.0+4*2-1/5")
-    test("27/3/3")
-    test("27/3.0/3")
-    test("27/3.0/3.0")
-    test("27.4/3.0/3.0")
-    test("27.4*3.0/3.0")
-    test("1+1+2+32/3*12*3")
     test("(3.0+4*(2-1))/5")
     print("==== Test finished! ====\n")
 

@@ -62,6 +62,7 @@ def tokenize(line):
     return tokens
 
 
+#1回目の評価：掛け算と割り算を計算する
 def first_evaluate(tokens):
     evaluated_tokens = []
     tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
@@ -78,11 +79,13 @@ def first_evaluate(tokens):
                 evaluated_tokens.append(tokens[index])
 
             elif tokens[index - 1]['type'] == 'TIMES':
+                #numには掛けられる数をevaluated_tokensの一番後ろから取り出し入れる
                 num = evaluated_tokens.pop(-1)
                 answer = num['number']*tokens[index]['number']
                 evaluated_tokens.append({'type': 'NUMBER', 'number': answer})
 
             elif tokens[index - 1]['type'] == 'DIVIDED':
+                #numには割られる数をevaluated_tokensの一番後ろから取り出し入れる
                 num = evaluated_tokens.pop(-1)
                 answer = num['number']/tokens[index]['number']
                 evaluated_tokens.append({'type': 'NUMBER', 'number': answer})
@@ -93,6 +96,8 @@ def first_evaluate(tokens):
         index += 1
     return evaluated_tokens
 
+
+#2回目の評価：足し算と引き算を計算する
 def second_evaluate(tokens):
     answer = 0
     index = 1
@@ -108,6 +113,7 @@ def second_evaluate(tokens):
         index += 1
     return answer
 
+
 def test(line):
     tokens = tokenize(line)
     evaluated_tokens = first_evaluate(tokens)
@@ -122,15 +128,42 @@ def test(line):
 # Add more tests to this function :)
 def run_test():
     print("==== Test started! ====")
-    # test("1+2")
-    # test("1.0+2.1-3")
-    # test("3.0+4*2-1/5")
-    # test("27/3/3")
-    # test("27/3.0/3")
-    # test("27/3.0/3.0")
-    # test("27.4/3.0/3.0")
-    # test("27.4*3.0/3.0")
-    # test("1+1+2+32/3*12*3")
+    test("1+2") #足し算のみ、整数のみ
+    test("2.3+5.4") #足し算のみ、小数のみ
+    test("11+2.43") #足し算のみ、整数と小数
+    test("2.43+11") #足し算のみ、整数と小数、位置を交換
+
+    test("2-1") #引き算のみ、整数のみ、答えが正の場合
+    test("1-2") #引き算のみ、整数のみ、答えが負の場合
+    test("5.4-2.3") #引き算のみ、小数のみ、答えが正の場合
+    test("2.3-5.4") #引き算のみ、小数のみ、答えが負の場合
+    test("11-2.43") #引き算のみ、整数と小数、答えが正の場合
+    test("11-12.24") #引き算のみ、整数と小数、答えが負の場合
+
+    test("2*1") #掛け算のみ、整数のみ
+    test("5.4*2.3") #掛け算のみ、小数のみ
+    test("11*2.43") #掛け算のみ、整数と小数
+    test("2.43*11") #掛け算のみ、整数と小数、位置を交換
+
+    test("9/3") #割り算のみ、整数のみ、余りなし
+    test("13/2") #割り算のみ、整数のみ、余りあり
+    test("6.4/3.2") #割り算のみ、小数のみ、余りなし
+    test("4.2/3.2") #割り算のみ、小数のみ、余りあり
+    test("9/2.43") #割り算のみ、整数と小数、余りなし
+    test("11*2.43") #割り算のみ、整数と小数、余りあり
+
+    test("6+2.1-3") #足し算、引き算
+    test("1.0+2.1*3") #足し算、掛け算
+    test("1.0+2.1/3") #足し算、割り算
+    test("2.1-3*6") #引き算、掛け算
+    test("2.1-3/3") #引き算、割り算
+    test("6*4/2.6") #掛け算、割り算
+    test("1.0+2.1-3*4.2") #足し算、引き算、掛け算
+    test("1.0+2.1-3*6/2.9") #足し算、引き算、掛け算、割り算
+
+    test("1.0+2.1-3*8/4/3*5+9.7-0.7+3/3*6") #足し算、引き算、掛け算、割り算、式ロングバージョン
+    test("1") #演算子がない場合
+
     print("==== Test finished! ====\n")
 
 run_test()
