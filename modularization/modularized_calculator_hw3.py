@@ -41,7 +41,7 @@ def read_left_parenthesis(line, index):
 
 
 def tokenize(line):
-    tokens_stack = []
+    tokens = []
     index = 0
     while index < len(line):
         if line[index].isdigit():
@@ -65,12 +65,12 @@ def tokenize(line):
         elif line[index] == ')':
             #括弧の中を計算する
             temp_tokens = []
-            temp_index = len(tokens_stack)-1
-            while tokens_stack[temp_index] != {'type': 'LEFT_PARENTHESIS'}:
-                temp_tokens.insert(0, tokens_stack[temp_index])
-                tokens_stack.pop(-1)
+            temp_index = len(tokens)-1
+            while tokens[temp_index] != {'type': 'LEFT_PARENTHESIS'}:
+                temp_tokens.insert(0, tokens[temp_index])
+                tokens.pop(-1)
                 temp_index -= 1
-            tokens_stack.pop(-1)
+            tokens.pop(-1)
             evaluated_tokens = first_evaluate(temp_tokens)
             answer_in_parentheses = second_evaluate(evaluated_tokens)
             token = {'type': 'NUMBER', 'number': answer_in_parentheses}
@@ -80,8 +80,8 @@ def tokenize(line):
         else:
             print('Invalid character found: ' + line[index])
             exit(1)
-        tokens_stack.append(token)
-    return tokens_stack
+        tokens.append(token)
+    return tokens
 
 
 def first_evaluate(tokens):
