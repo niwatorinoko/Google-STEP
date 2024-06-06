@@ -1,2 +1,8 @@
 .vscode/
 __pycache__/
+graph/links_small.txt
+graph/pages_small.txt
+graph/links_medium.txt
+graph/pages_medium.txt
+graph/links_large.txt
+graph/pages_large.txt
