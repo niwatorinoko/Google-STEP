@@ -1,4 +1,4 @@
-import sys
+import sys, time
 from collections import deque, defaultdict
 
 
@@ -21,9 +21,6 @@ class Wikipedia:
 
         # pageのidとpagerank初期値1を割り当てる辞書
         self.ranks = {}
-
-        #key->id,value->リンクもとのid
-        self.incoming_links = defaultdict(list)
         
         # Read the pages file into self.titles.
         with open(pages_file) as file:
@@ -45,9 +42,11 @@ class Wikipedia:
                 assert src in self.id_to_titles, src
                 assert dst in self.id_to_titles, dst
                 self.links[src].append(dst)
-                self.incoming_links[dst].append(src)
         print("Finished reading %s" % links_file)
         print()
+
+        # 初期化の際コピーする辞書
+        self.copy_ranks = {page: 0 for page in self.id_to_titles}
 
 
     # Find the longest titles. This is not related to a graph algorithm at all
@@ -111,35 +110,44 @@ class Wikipedia:
 
 
     def find_words_id(self, start, goal):
+        assert start in self.title_to_id
+        assert goal in self.title_to_id
         return self.title_to_id[start], self.title_to_id[goal]
 
 
     # Calculate the page ranks and print the most popular pages.
     def find_most_popular_pages(self):
-        d = 0.85  # ダンピングファクター（リンクをたどる確率）
-        num_iterations = 100  # 最大反復回数
-        tolerance = 0.01  # 収束基準の許容誤差
-        total = 0
+
         for iteration in range(100):
-            new_ranks = {page: 0 for page in self.id_to_titles}  # 各ページの新しいPageRankを初期化
+            begin = time.time()
+            new_ranks = self.copy_ranks.copy()  # 各ページの新しいPageRankを初期化
             for key, value in self.links.items():
-                for id in value:
-                    new_ranks[id] += self.ranks[key]/len(value)
-                # total += 1.0*self.ranks[key]
-            # for l in new_ranks:
-            #     new_ranks[l] += total
+                if value:
+                    for id in value:
+                        # ノードPのページランクの85%は隣接ノードに均等に分配する
+                        new_ranks[id] += 0.85 * self.ranks[key] / len(value)
+                    # 残りの15%は全ノードに均等に分配する
+                    new_ranks[id] += 0.15 / len(self.id_to_titles)
+                else: # 隣接ノードがない場合
+                    for page in self.id_to_titles:
+                        # ノードPのページランクの100%を全ノードに均等に分配する
+                        new_ranks[page] += self.ranks[key]
+
+
+            error = 0
+            for page in self.id_to_titles.keys():
+                error += (new_ranks[page] - self.ranks[page]) ** 2
+            if error < 0.01:
+                break
             self.ranks = new_ranks
-            #∑(new[i] - old[i])^2 < 0.01　収束の条件
-        print(self.ranks)
-        pass
+            end = time.time()
+            print("%d %.6f" % (iteration, end - begin))
 
-
-    # Do something more interesting!!
-    def find_something_more_interesting(self):
-        #------------------------#
-        # Write your code here!  #
-        #------------------------#
-        pass
+        sorted_ranks = sorted(self.ranks.items(), key=lambda x: x[1], reverse=True)
+        print("The most popular pages are:")
+        for page, rank in sorted_ranks[:10]:
+            print(f"{self.id_to_titles[page]}: {rank:.4f}")
+        print()
 
 
 if __name__ == "__main__":
@@ -151,4 +159,6 @@ if __name__ == "__main__":
     # wikipedia.find_longest_titles()
     # wikipedia.find_most_linked_pages()
     # wikipedia.find_shortest_path("渋谷", "パレートの法則")
-    wikipedia.find_most_popular_pages()
+    # wikipedia.find_longest_path("渋谷", "パレートの法則")
+    wikipedia.find_most_longest_path("A", "F")
+    # wikipedia.find_most_popular_pages()
