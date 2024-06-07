@@ -1,6 +1,8 @@
 import sys, time
 from collections import deque, defaultdict
 
+#Wikipediaで47都道府県１週するにはどのくらいかかるか。
+#1つの都道府県から1つの都道府県をたどったら、visitedはリセットする。
 
 class Wikipedia:
 
@@ -49,39 +51,6 @@ class Wikipedia:
         self.copy_ranks = {page: 0 for page in self.id_to_titles}
 
 
-    # Find the longest titles. This is not related to a graph algorithm at all
-    # though :)
-    def find_longest_titles(self):
-        titles = sorted(self.id_to_titles.values(), key=len, reverse=True)
-        print("The longest titles are:")
-        count = 0
-        index = 0
-        while count < 15 and index < len(titles):
-            if titles[index].find("_") == -1:
-                print(titles[index])
-                count += 1
-            index += 1
-        print()
-
-
-    # Find the most linked pages.
-    def find_most_linked_pages(self):
-        link_count = {}
-        for id in self.id_to_titles.keys():
-            link_count[id] = 0
-
-        for id in self.id_to_titles.keys():
-            for dst in self.links[id]:
-                link_count[dst] += 1
-
-        print("The most linked pages are:")
-        link_count_max = max(link_count.values())
-        for dst in link_count.keys():
-            if link_count[dst] == link_count_max:
-                print(self.id_to_titles[dst], link_count_max)
-        print()
-
-
     # Find the shortest path.
     # |start|: The title of the start page.
     # |goal|: The title of the goal page.
@@ -99,8 +68,7 @@ class Wikipedia:
         while queue:
             node = queue.popleft()
             if node[0] == goal_id:
-                print(node[1])
-                return True
+                return node[1]
             for child in self.links[node[0]]:
                 if not child in visited:
                     visited[child] = True
@@ -114,40 +82,16 @@ class Wikipedia:
         assert goal in self.title_to_id
         return self.title_to_id[start], self.title_to_id[goal]
 
-
-    # Calculate the page ranks and print the most popular pages.
-    def find_most_popular_pages(self):
-
-        for iteration in range(100):
-            begin = time.time()
-            new_ranks = self.copy_ranks.copy()  # 各ページの新しいPageRankを初期化
-            for key, value in self.links.items():
-                if value:
-                    for id in value:
-                        # ノードPのページランクの85%は隣接ノードに均等に分配する
-                        new_ranks[id] += 0.85 * self.ranks[key] / len(value)
-                    # 残りの15%は全ノードに均等に分配する
-                    new_ranks[id] += 0.15 / len(self.id_to_titles)
-                # else: # 隣接ノードがない場合
-                #     for page in self.id_to_titles:
-                #         # ノードPのページランクの100%を全ノードに均等に分配する
-                #         new_ranks[page] += self.ranks[key]
-
-
-            error = 0
-            for page in self.id_to_titles.keys():
-                error += (new_ranks[page] - self.ranks[page]) ** 2
-            if error < 0.01:
-                break
-            self.ranks = new_ranks
-            end = time.time()
-            print("%d %.6f" % (iteration, end - begin))
-
-        sorted_ranks = sorted(self.ranks.items(), key=lambda x: x[1], reverse=True)
-        print("The most popular pages are:")
-        for page, rank in sorted_ranks[:10]:
-            print(f"{self.id_to_titles[page]}: {rank:.4f}")
-        print()
+    def find_shortest_path_around_Japan(self, prefectures):
+        total_path = 0
+        start = prefectures[0] #北海道
+        for goal in range(1, len(prefectures)):
+            print(goal)
+            path = self.find_shortest_path(start, prefectures[goal])
+            total_path += path
+            print(start + "から" + prefectures[goal] + "まで" + str(path) + "かかる。合計" + str(total_path))
+            start = prefectures[goal]
+        print(total_path)
 
 
 if __name__ == "__main__":
@@ -156,9 +100,12 @@ if __name__ == "__main__":
         exit(1)
 
     wikipedia = Wikipedia(sys.argv[1], sys.argv[2])
-    # wikipedia.find_longest_titles()
-    # wikipedia.find_most_linked_pages()
-    # wikipedia.find_shortest_path("渋谷", "パレートの法則")
-    # wikipedia.find_longest_path("渋谷", "パレートの法則")
-    # wikipedia.find_most_longest_path("A", "F")
-    wikipedia.find_most_popular_pages()
+    prefectures = [
+        "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+        "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+        "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
+        "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
+        "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
+        "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
+        "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"]
+    wikipedia.find_shortest_path_around_Japan(prefectures)
